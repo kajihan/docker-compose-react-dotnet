@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  frontend:
+    build: ./dofd-05-kajihan
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_BASE_URL=http://backend:5000/api
+
+  backend:
+    build: ./dotnet-app-kajihan
+    ports:
+      - "5000:80"
+    depends_on:
+      - db
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__Default=Server=db;Initial Catalog=Products;User=sa;Password=Passw0rd!;TrustServerCertificate=True
+    entrypoint: ["bash", "-c", "sleep 30s && dotnet Products.dll"]
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=Passw0rd!
+      - MSSQL_PID=Standard
+    ports:
+      - "1433:1433"
